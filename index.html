@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="logo.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hefe Client - Premium DDNet Enhancement</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+        }
+
+        .preloader-logo {
+            font-size: 3rem;
+            color: #ff0000;
+            text-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
+            margin-bottom: 2rem;
+            animation: preloaderGlow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes preloaderGlow {
+            from { text-shadow: 0 0 30px rgba(255, 0, 0, 0.8); }
+            to { text-shadow: 0 0 50px rgba(255, 0, 0, 1), 0 0 60px rgba(255, 0, 0, 0.8); }
+        }
+
+        .loading-bar {
+            width: 300px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loading-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ff4444);
+            width: 0%;
+            animation: loadingFill 3s ease-out forwards;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
+        @keyframes loadingFill {
+            to { width: 100%; }
+        }
+
+        .preloader.fade-out {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .stats-bar {
+            background: rgba(15, 15, 15, 0.95);
+            padding: 0.5rem 0;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 0, 0, 0.2);
+            font-size: 0.9rem;
+        }
+
+        .stats-counter {
+            color: #ff4444;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
+        header {
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            
+            z-index: 100;
+            box-shadow: 0 4px 30px rgba(255, 0, 0, 0.1);
+            height: 60px;
+            text-align: center;
+        }
+
+        nav {
+            
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            height: 40px;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.5));
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.8));
+        }
+
+        .nav-links {
+            margin-top: 20px;
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            position: relative;
+            
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 0, 0, 0.1);
+            border-color: rgba(255, 0, 0, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 0, 0, 0.2);
+            color: #ff4444;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 6rem 0;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255, 0, 0, 0.1) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        .hero h1 {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
+            animation: redGlow 2s ease-in-out infinite alternate;
+            color: #ffffff;
+        }
+
+        @keyframes redGlow {
+            from { 
+                text-shadow: 0 0 30px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.6);
+            }
+            to { 
+                text-shadow: 0 0 50px rgba(255, 0, 0, 1), 0 0 60px rgba(255, 0, 0, 0.8), 0 0 70px rgba(255, 0, 0, 0.6);
+            }
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, #ff0000, #cc0000);
+            color: white;
+            padding: 1.2rem 3rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            border: 1px solid rgba(255, 0, 0, 0.4);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(255, 0, 0, 0.5), 0 0 30px rgba(255, 0, 0, 0.6);
+            background: linear-gradient(45deg, #ff2222, #ee0000);
+        }
+
+        .section {
+            padding: 4rem 0;
+            margin: 3rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 4rem;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .feature-card {
+            background: rgba(15, 15, 15, 0.8);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: pulsingBorder 2s ease-in-out infinite;
+        }
+
+        @keyframes pulsingBorder {
+            0% { border-color: rgba(255, 0, 0, 0.3); }
+            50% { border-color: rgba(255, 0, 0, 0.6); }
+            100% { border-color: rgba(255, 0, 0, 0.3); }
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 0, 0, 0.3);
+            border-color: rgba(255, 0, 0, 0.8);
+            background: rgba(20, 20, 20, 0.9);
+            animation: none;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: #ff4444;
+            filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.5));
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .feature-card p {
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        .changelog {
+            background: rgba(10, 10, 10, 0.8);
+            border-radius: 8px;
+            padding: 3rem;
+            margin: 2rem auto;
+            
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .version {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .version:last-child {
+            border-bottom: none;
+        }
+
+        .version h3 {
+            color: #ff4444;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+        }
+
+        .version-date {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .version ul {
+            padding-left: 1.5rem;
+        }
+
+        .version li {
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .download-section {
+            text-align: center;
+            background: rgba(15, 15, 15, 0.8);
+            border-radius: 8px;
+            padding: 4rem;
+            margin: 2rem auto;
+            max-width: 600px;
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+            
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .testimonial-card {
+            background: rgba(15, 15, 15, 0.8);
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 0, 0, 0.4);
+        }
+
+        .testimonial-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #ff0000, #cc0000);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .testimonial-name {
+            font-weight: bold;
+            color: #ff4444;
+        }
+
+        .testimonial-rating {
+            color: #ffd700;
+            margin-left: auto;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .pricing-card {
+            background: rgba(15, 15, 15, 0.8);
+            border: 2px solid rgba(255, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .pricing-card.featured {
+            border-color: rgba(255, 0, 0, 0.6);
+            transform: scale(1.05);
+        }
+
+        .pricing-card.featured::before {
+            content: 'MOST POPULAR';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff0000;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .pricing-card.featured:hover {
+            transform: translateY(-5px) scale(1.05);
+        }
+
+        .pricing-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #ff4444;
+        }
+
+        .pricing-price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #ff4444;
+            font-weight: bold;
+        }
+
+
+
+        .hidden-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            z-index: 1000;
+            text-align: center;
+            padding-top: 15vh;
+        }
+
+        .hidden-page h1 {
+            font-size: 4rem;
+            color: #ff0000;
+            margin-bottom: 2rem;
+            animation: pulse 1s infinite;
+            text-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
+        }
+
+        .hidden-content {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .creator-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem 0;
+            gap: 2rem;
+        }
+
+        .tee-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .close-hidden {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 3rem;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="preloader" id="preloader">
+        <div class="preloader-logo">HEFE CLIENT</div>
+        <div class="loading-bar">
+            <div class="loading-fill"></div>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="container">
+            Total Downloads: <span class="stats-counter">69</span> | Online Users: <span class="stats-counter">1,337</span> | Server Status: <span style="color: #00ff00;">ONLINE</span>
+        </div>
+    </div>
+
+    <header>
+        <nav class="container">
+
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#testimonials">Reviews</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                
+                <li><a href="#download">Download</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="container">
+                <h1>HEFE CLIENT</h1>
+                <p>The Ultimate DDNet Enhancement Suite - Dominate Every Server</p>
+                <a href="#download" class="cta-button">Download Now</a>
+            </div>
+        </section>
+
+        <section id="features" class="section">
+            <div class="container">
+                <h2 class="section-title">Premium Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3>Advanced Aimbot</h3>
+                        <p>Precision targeting system with customizable smoothness and FOV settings. Never miss a hook again.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">👁️</div>
+                        <h3>Smart Hammer</h3>
+                        <p>Hammer your enemies automatically to fling them.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Speed Boost</h3>
+                        <p>Bypass speed limitations and move faster than ever before with intelligent anti-detection.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌟</div>
+                        <h3>Noclip Mode</h3>
+                        <p>Phase through any terrain and obstacles. Perfect for exploring and strategic positioning.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔮</div>
+                        <h3>Prediction Engine</h3>
+                        <p>AI-powered movement prediction to anticipate enemy actions and plan perfect strategies.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🛡️</div>
+                        <h3>Anti-Detection</h3>
+                        <p>Military-grade obfuscation keeps you undetected from server-side anti-cheat systems.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>Performance Monitor</h3>
+                        <p>Real-time statistics, ping optimization, and frame rate enhancement tools.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <h3>Infinite Jumps</h3>
+                        <p>Never run out of jumps during intense gameplay sessions. Maintain peak performance indefinitely.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <h3>Auto-Play Bot</h3>
+                        <p>Intelligent bot that can complete maps automatically with human-like movement patterns.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="testimonials" class="section">
+            <div class="container">
+                <h2 class="section-title">What Our Users Say</h2>
+                <div class="testimonials-grid">
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <div class="testimonial-avatar">P</div>
+                            <div>
+                                <div class="testimonial-name">ProGamer2024</div>
+                                <div style="font-size: 0.9rem; opacity: 0.7;">Verified User</div>
+                            </div>
+                            <div class="testimonial-rating">★★★★★</div>
+                        </div>
+                        <p>"Absolutely insane! Went from noob to pro in just 2 days. The aimbot is so smooth nobody suspects anything. 10/10 would recommend!"</p>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <div class="testimonial-avatar">S</div>
+                            <div>
+                                <div class="testimonial-name">SpeedRunner420</div>
+                                <div style="font-size: 0.9rem; opacity: 0.7;">Elite User</div>
+                            </div>
+                            <div class="testimonial-rating">★★★★★</div>
+                        </div>
+                        <p>"Finally a cheat that actually works! Completed Moderate maps in seconds with the auto-play bot. Worth every penny!"</p>
+                    </div>
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <div class="testimonial-avatar">M</div>
+                            <div>
+                                <div class="testimonial-name">MapHacker69</div>
+                                <div style="font-size: 0.9rem; opacity: 0.7;">VIP Member</div>
+                            </div>
+                            <div class="testimonial-rating">★★★★★</div>
+                        </div>
+                        <p>"Used other cheats before but they all got detected. Hefe Client is different - been using it for 6 months without any issues!"</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="section">
+            <div class="container">
+                <h2 class="section-title">Choose Your Plan</h2>
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <div class="pricing-title">FREE</div>
+                        <div class="pricing-price">$0<span style="font-size: 1rem;">/month</span></div>
+                        <ul class="pricing-features">
+                            <li>Basic Aimbot</li>
+                            
+                            <li>Limited Speed Boost</li>
+                            <li>Community Support</li>
+                            <li>Weekly Updates</li>
+                        </ul>
+                        <a href="javascript:void(0)" onclick="fakeDownload()" class="cta-button">Get Started</a>
+                    </div>
+                    <div class="pricing-card featured">
+                        <div class="pricing-title">PREMIUM</div>
+                        <div class="pricing-price">$9.99<span style="font-size: 1rem;">/month</span></div>
+                        <ul class="pricing-features">
+                            <li>Advanced Aimbot with Smoothing</li>
+                            
+                            <li>Unlimited Speed Boost</li>
+                            <li>Noclip Mode</li>
+                            <li>Prediction Engine</li>
+                            <li>Anti-Detection Premium</li>
+                            <li>Priority Support</li>
+                            <li>Daily Updates</li>
+                        </ul>
+                        <a href="javascript:void(0)" onclick="fakeDownload()" class="cta-button">Go Premium</a>
+                    </div>
+                    <div class="pricing-card">
+                        <div class="pricing-title">ELITE</div>
+                        <div class="pricing-price">$19.99<span style="font-size: 1rem;">/month</span></div>
+                        <ul class="pricing-features">
+                            <li>Everything in Premium</li>
+                            <li>Auto-Play Bot</li>
+                            <li>Custom Script Support</li>
+                            <li>Infinite Jumps</li>
+                            <li>Performance Monitor Pro</li>
+                            <li>Exclusive Features</li>
+                            <li>24/7 VIP Support</li>
+                            <li>Instant Updates</li>
+                        </ul>
+                        <a href="javascript:void(0)" onclick="fakeDownload()" class="cta-button">Join Elite</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+        <section id="changelog" class="section">
+            <div class="container">
+                <h2 class="section-title">Changelog</h2>
+                <div class="changelog">
+                    <div class="version">
+                        <h3>Version 3.2.1</h3>
+                        <div class="version-date">July 1, 2025</div>
+                        <ul>
+                            <li>Fixed aimbot jitter on high refresh rate displays</li>
+                            
+                            <li>Added new anti-detection bypass for latest server updates</li>
+                            <li>Enhanced speed boost stability</li>
+                            <li>Updated skin collection with 12 new exclusive designs</li>
+                        </ul>
+                    </div>
+                    <div class="version">
+                        <h3>Version 3.2.0</h3>
+                        <div class="version-date">June 15, 2025</div>
+                        <ul>
+                            <li>Major overhaul of prediction engine with ML algorithms</li>
+                            <li>Added noclip mode with smart collision detection</li>
+                            <li>Implemented new GUI with dark theme</li>
+                            <li>Improved performance monitoring dashboard</li>
+                            <li>Optimized hook accuracy by 23%</li>
+                        </ul>
+                    </div>
+                    <div class="version">
+                        <h3>Version 3.1.5</h3>
+                        <div class="version-date">May 28, 2025</div>
+                        <ul>
+                            <li>Emergency patch for detection issues</li>
+                            <li>Updated signature masking algorithms</li>
+                            <li>Fixed auto-play bot getting stuck on certain maps</li>
+                            <li>Improved compatibility with latest DDNet version</li>
+                        </ul>
+                    </div>
+                    <div class="version">
+                        <h3>Version 3.1.0</h3>
+                        <div class="version-date">May 10, 2025</div>
+                        <ul>
+                            <li>Introduced auto-play bot feature</li>
+                            <li>Added performance monitoring dashboard</li>
+                            
+                            <li>Implemented advanced triggerbot</li>
+                            <li>Fixed various stability issues</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="download" class="section">
+            <div class="container">
+                <div class="download-section">
+                    <h2 class="section-title">Download Hefe Client</h2>
+                    <p>Latest Version: 3.2.1 | Size: 47.3 MB | Windows 10/11 Compatible</p>
+                    <br>
+                    <a href="javascript:void(0)" onclick="fakeDownload()" class="cta-button">Download Hefe Client v3.2.1</a>
+                    <br><br>
+                    <p style="font-size: 0.9rem; opacity: 0.7;">
+                        By downloading, you agree to our Terms of Service and Privacy Policy.<br>
+                        Use at your own risk. We are not responsible for any bans or consequences.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Hefe Client. All rights reserved. | Made with ❤️ for the DDNet community</p>
+        </div>
+    </footer>
+
+    <div id="hiddenPage" class="hidden-page">
+        <button class="close-hidden" onclick="hideHidden()">&times;</button>
+        <div class="hidden-content">
+            <h1>GOTCHA! 😂</h1>
+            <div class="creator-info">
+                <img src="tee.png" alt="Tee" class="tee-image">
+                <div>
+                    <p style="font-size: 1.8rem; color: #ff4444; margin-bottom: 1rem;">
+                        Made by <strong>Zelamus</strong>
+                    </p>
+                </div>
+            </div>
+            <p style="font-size: 1.5rem; color: #ffffff; margin-bottom: 2rem;">
+                This is just a meme website!
+            </p>
+            <p style="font-size: 1.2rem; opacity: 0.8; margin-bottom: 2rem;">
+                There's no actual cheat client here - just a realistic-looking fake site.<br>
+                Thanks for falling for it! 🎭
+            </p>
+            <div style="margin-top: 3rem;">
+                <p style="font-size: 1rem; opacity: 0.6;">
+                    Play DDNet fairly and have fun! 🎮
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Preloader
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                const preloader = document.getElementById('preloader');
+                preloader.classList.add('fade-out');
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 500);
+            }, 3000);
+        });
+
+        function showHidden() {
+            document.getElementById('hiddenPage').style.display = 'block';
+        }
+
+        function hideHidden() {
+            document.getElementById('hiddenPage').style.display = 'none';
+        }
+
+        function fakeDownload() {
+            alert('🎭 GOTCHA! This is just a meme website - there\'s no actual download! Thanks for falling for it! 😂');
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add some floating particles effect
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.style.position = 'fixed';
+            particle.style.width = '3px';
+            particle.style.height = '3px';
+            particle.style.backgroundColor = '#ff0000';
+            particle.style.borderRadius = '50%';
+            particle.style.pointerEvents = 'none';
+            particle.style.zIndex = '1';
+            particle.style.opacity = '0.6';
+            particle.style.boxShadow = '0 0 6px rgba(255, 0, 0, 0.8)';
+            particle.style.left = Math.random() * window.innerWidth + 'px';
+            particle.style.top = window.innerHeight + 'px';
+            
+            document.body.appendChild(particle);
+            
+            const animation = particle.animate([
+                { transform: 'translateY(0px)', opacity: 0.6 },
+                { transform: `translateY(-${window.innerHeight + 100}px)`, opacity: 0 }
+            ], {
+                duration: 4000 + Math.random() * 2000,
+                easing: 'linear'
+            });
+            
+            animation.onfinish = () => particle.remove();
+        }
+
+        // Create particles periodically
+        setInterval(createParticle, 300);
+
+        // Add glow effect to body
+        document.body.style.boxShadow = 'inset 0 0 100px rgba(255, 0, 0, 0.1)';
+    </script>
+</body>
+</html>
